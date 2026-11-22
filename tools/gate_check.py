@@ -275,7 +275,7 @@ def ctex_checks():
     small, total = [], 0
     for imp in sorted(sources):
         text = open(imp, encoding="utf-8").read()
-        dests = re.findall(r'"res://(\.godot/imported/[^"]+\.ctex)"', text)
+        dests = sorted(set(re.findall(r'"res://(\.godot/imported/[^"]+\.ctex)"', text)))
         check(bool(dests), f"{os.path.relpath(imp, GD)} has imported .ctex")
         for d in dests:
             p = os.path.join(GD, d)
@@ -293,7 +293,7 @@ def ctex_checks():
     check(total > 0, f"{total} .ctex files audited")
     check(not small, "0 .ctex at <= 256 px in textures/terrain + models", "; ".join(small))
     r = subprocess.run([sys.executable, os.path.join(TOOLS, "texture_budget.py"), "--check"], capture_output=True, text=True)
-    for line in r.stdout.strip().splitlines():
+    for line in r.stdout.rstrip().splitlines():
         print("  | " + line)
     check(r.returncode == 0, "texture_budget.py --check")
 
