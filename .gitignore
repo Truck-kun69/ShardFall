@@ -1,0 +1,13 @@
+# Godot
+godot/.godot/
+godot/android/
+*.import.tmp
+# Build output and signing material (never commit keystores)
+build/
+*.keystore
+*.jks
+__pycache__/
+tools/asset_cache.json.lock
+
+# Connector raw downloads (large binaries); the spend cache stays tracked.
+tools/asset_raw/
