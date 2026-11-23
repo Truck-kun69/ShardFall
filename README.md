@@ -1,18 +1,70 @@
-# ShardFall
+# Shardfall: Rift Survivors
 
-**Shardfall Survivors** is a single-file browser survivor game (`index.html`). Open it in a browser, or serve the folder (`python3 -m http.server`) and visit `/index.html`.
+Mobile-first 3D survivor action roguelite. **Godot 4.7.2, Mobile (Vulkan)
+renderer, Android arm64-v8a only.** There is no web build and no lite build.
 
-- Four heroes, four stages, a boss per stage, then a choice of portal: Golden Sanctuary (bank the run) or Crimson Rift (Endless Delve).
-- Ascendancy at level 5, hybrid class at level 10, elemental damage over time, relics, Blood Shrines, the Malakor nemesis, a Phantom Mirror clone and points of interest on the map.
-- Controls: drag anywhere to move on touch, WASD or the arrow keys on a keyboard. Double-tap or Space/Shift to roll, Esc or P to pause.
+- 4 heroes (Warden, Sparkcaller, Emberwitch, Stormwright), 5 themed acts, each with a boss.
+- 60 Hz fixed-step simulation (`godot/scripts/sim/`) with render interpolation, a
+  720-slot structure-of-arrays swarm, 5 archetypes plus elites, 5 elements with
+  reaction cascades, dodge roll with perfect-dodge riposte, and a vaulting jump.
+- Deterministic chunked props with collision. The same layout is used on every quality tier.
+- Low / Medium / High quality auto-detected from GPU + RAM, overridable in Options,
+  with an OpenGL ES 3 safe mode for unstable Mali Vulkan drivers.
+- Runs entirely on procedural meshes, clips, audio and CC0 textures ($0.00). Generated
+  assets dropped into `godot/models/` replace them (see `godot/models/README.md`).
 
-## Optional files
+## Layout
 
-The game runs without these. When they're missing it draws its own shapes and uses system fonts.
+```
+godot/                 Godot project (open this folder in the editor)
+  scripts/sim/         fixed step, swarm, spatial grid, terrain, prop layout, bosses, world
+  scripts/render3d/    quality tiers, world view, menu stage, FX, models, hero/boss rigs
+  scripts/ui/          touch controls, HUD, menus
+  scripts/autoload/    save profile, procedural audio
+  shaders/3d/          terrain (+ shared height include), water, fog, props, foes, decals
+  tests/               gate_chunk.tscn, tests.tscn (unit), render_shot.tscn (GPU smoke)
+tools/
+  gate_check.py        release gate (must exit 0)
+  build_android.sh     the one canonical APK build
+  asset_audit.py       GLB / texture / VAT auditor used by the gate
+  texture_budget.py    per-category import limits (--apply / --check)
+  gen_textures.py      procedural tileable terrain textures
+  asset_connectors.py  queued fal.ai pipeline (dry run unless explicitly armed)
+  blender/process_assets.py  headless Blender 4.5+ normaliser/baker
+```
 
-- `sprites/`: `warden.jpg`, `sparkcaller.jpg`, `emberwitch.jpg`, `stormwright.jpg`, `malakor.jpg`, `bosses.jpg`, `enemies.jpg`, `pois.jpg`
-- `vendor/fonts.css` (Bungee and Barlow Condensed) and `vendor/three.min.js` (if this is missing, three.js loads from cdnjs instead)
+## Build and verify
 
-## Renderer
+Requirements: Godot 4.7.2 with export templates, Android SDK (build-tools +
+platform-tools), JDK 17+, Python 3 with numpy and Pillow, and Xvfb (or a display)
+with a Vulkan driver for the render smoke test.
 
-The game draws in 2D. A Three.js renderer is included but turned off (`USE_3D = false`) because it's unfinished: it draws pickups and projectiles but not the hero, enemies or ground.
+```bash
+python3 tools/gate_check.py
+```
+
+```bash
+bash tools/build_android.sh
+```
+
+The build creates a release keystore at `~/.shardfall/release.keystore` on first
+run (override with `SHARDFALL_KEYSTORE`, `SHARDFALL_KEY_ALIAS` and `SHARDFALL_KEY_PASS`).
+Keystores are never written into the repository. Output: `build/ShardFall.apk`.
+
+## Controls
+
+Touch: left-thumb floating (or fixed) joystick; right-thumb ROLL, JUMP, ULT, 1, 2.
+Keyboard: WASD/arrows to move, Shift to roll, Space to jump, Q/E for skills, R for
+the ultimate, Esc to pause. Gamepads are supported.
+
+## Generated assets (optional, costs money)
+
+```bash
+python3 tools/asset_connectors.py --plan --canary
+```
+
+This prints the queue and the estimated cost, and spends nothing. A real run needs
+`--run-connectors`, `FAL_KEY` set in the environment and a `--cap` in USD. Then
+process the results with
+`blender -b -P tools/blender/process_assets.py -- --raw tools/asset_raw --out godot/models`
+and re-run the gate.

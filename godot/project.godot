@@ -1,0 +1,61 @@
+; Engine configuration file.
+; Shardfall: Rift Survivors — Godot 4.7.2, Mobile renderer, Android (arm64-v8a) only.
+
+config_version=5
+
+[application]
+
+config/name="Shardfall: Rift Survivors"
+config/description="Mobile-first 3D survivor action roguelite."
+config/version="0.1.0-alpha"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "Mobile")
+config/icon="res://icon.svg"
+config/project_settings_override="user://override.cfg"
+boot_splash/bg_color=Color(0.05, 0.063, 0.098, 1)
+boot_splash/show_image=false
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
+
+[autoload]
+
+Save="*res://scripts/autoload/save.gd"
+Sfx="*res://scripts/autoload/sfx.gd"
+
+[debug]
+
+file_logging/enable_file_logging.android=false
+gdscript/warnings/integer_division=0
+gdscript/warnings/narrowing_conversion=0
+gdscript/warnings/unused_parameter=0
+gdscript/warnings/shadowed_variable_base_class=0
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
+window/energy_saving/keep_screen_on=true
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=false
+pointing/emulate_touch_from_mouse.android=false
+pointing/emulate_mouse_from_touch=true
+
+[rendering]
+
+renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
+rendering_device/fallback_to_opengl3=true
+textures/vram_compression/import_etc2_astc=true
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
+lights_and_shadows/positional_shadow/atlas_size=1024
+environment/defaults/default_clear_color=Color(0.05, 0.063, 0.098, 1)
+anti_aliasing/quality/msaa_3d=0
+anti_aliasing/quality/screen_space_aa=0
